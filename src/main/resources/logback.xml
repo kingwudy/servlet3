@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="true" scanPeriod="5 minutes">
+    <jmxConfigurator/>
+    <property name="logstash.path" value="/D:/opt/logs"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logstash.path}/servlet3.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logstash.path}/servlet3.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+            <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{ISO8601} [%thread] %-5level %X{mdcId} %logger{36}:%L - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- 异步输出 -->
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>512</queueSize>
+        <!-- 提取调用者数据的代价是相当昂贵的 -->
+        <!--<includeCallerData>true</includeCallerData>-->
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="FILE"/>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{ISO8601} [%thread] %-5level %X{mdcId} %logger{36}:%L - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--<logger name="test" level="INFO" additivity="false">-->
+    <!--<appender-ref ref="STDOUT" />-->
+    <!--</logger>-->
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <!--<appender-ref ref="FILE" />-->
+    </root>
+</configuration>
